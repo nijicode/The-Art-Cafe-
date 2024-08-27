@@ -93,7 +93,7 @@ const Testimonials = () => {
         whileInView={"show"}
         viewport={{ once: false }}
       >
-        <div className=" flex justify-between w-full h-[200px] p-10 rounded-t-lg  ">
+        <div className=" flex justify-between w-full h-[200px] py-10 rounded-t-lg  ">
           <div>
             <p className="uppercase text-xs">What People Say:</p>
             <p className="capitalize text-3xl text-white font-bold">
@@ -116,7 +116,7 @@ const Testimonials = () => {
           </button>
         </div>
 
-        <div className="w-full h-auto px-10 gap-10 -mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="w-full h-auto gap-10 -mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {currentTestimonials(testimonials.slice().reverse()).map(
             (testimonial, index) => (
               <motion.div
