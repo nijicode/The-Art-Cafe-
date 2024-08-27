@@ -78,7 +78,7 @@ const Nav = () => {
             </li>
           ))}
         </ul>
-        <ul className="flex items-center md:ml-0 ml-2">
+        <ul className="hidden sm:flex items-center md:ml-0 ml-2">
           {Socials.map((social) => (
             <li key={social.icon} className="md:ml-6 ml-2 ">
               <a

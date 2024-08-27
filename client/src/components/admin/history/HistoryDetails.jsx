@@ -119,7 +119,7 @@ const HistoryDetails = ({ name, image, description }) => {
             <div className=" w-[300px] border-2 rounded-lg overflow-hidden group ">
               <img
                 className="w-full h-[200px] object-cover object-center group-hover:scale-110 cursor-pointer duration-500 "
-                src={`http://localhost:3001/about/${image}`}
+                src={`${url}about/${image}`}
                 alt={`art-cafe ${name} image`}
               />
             </div>

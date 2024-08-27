@@ -65,7 +65,7 @@ const Menu = () => {
             </h1>
 
             {itemsForCategory.length > 0 ? (
-              <div className="grid px-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 w-full gap-10 mt-8 md:p-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 w-full gap-10 mt-8 md:p-12">
                 {itemsForCategory
                   .slice()
                   .reverse()
