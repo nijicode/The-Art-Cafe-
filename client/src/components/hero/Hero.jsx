@@ -27,7 +27,7 @@ const Hero = () => {
       <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,.9)]"></div>
       <video
         className="w-full h-full object-cover object-center"
-        src={`${url}${video}`}
+        src={`${url}video/${video}`}
         autoPlay
         loop
         muted

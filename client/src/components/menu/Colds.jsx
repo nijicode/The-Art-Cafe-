@@ -43,7 +43,6 @@ const Colds = ({
 
     return diffDays <= 7;
   };
-  console.log(isNew());
   return (
     <div
       className=" select-none duration-500 hover:scale-105 "
