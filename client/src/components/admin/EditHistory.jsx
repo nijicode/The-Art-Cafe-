@@ -8,6 +8,7 @@ import useListenHistory from "../../hooks/socketListener/useListenHistory";
 const EditHistory = () => {
   const { loading } = useGetHistory();
   const { history } = useHistoryStorage();
+
   useListenHistory();
   return (
     <div className="flex flex-col w-full pt-10 items-center text-white ">

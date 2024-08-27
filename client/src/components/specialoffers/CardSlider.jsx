@@ -8,6 +8,7 @@ const CardSlider = ({
   // const slides = [cold1, cold2, cold3, cold4, cold5];
   const [slides, setSlides] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const url = "https://the-art-cafe.onrender.com/";
 
   useEffect(() => {
     if (offers && offers.images) {
@@ -40,7 +41,7 @@ const CardSlider = ({
     <div className="max-w-3xl h-[350px] lg:h-[400px] xl:h-[500px] 2xl:h-[600px] relative group">
       <div className="absolute w-full h-full overflow-hidden border-2 rounded-3xl">
         <img
-          src={`http://localhost:3001/carousel/${slides[currentIndex]}`}
+          src={`${url}carousel/${slides[currentIndex]}`}
           className="object-cover duration-500 w-full h-full hover:scale-110  object-center"
           alt="carousel img"
         />

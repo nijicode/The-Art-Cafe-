@@ -16,7 +16,7 @@ const Colds = ({
   description,
   createdAt,
 }) => {
-  const url = "http://localhost:3001";
+  const url = "https://the-art-cafe.onrender.com/";
   const [isClicked, setIsClicked] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -66,7 +66,7 @@ const Colds = ({
           )}
           <div className="relative">
             <img
-              src={`${url}/images/${img}`}
+              src={`${url}images/${img}`}
               alt={`${name} image`}
               className="h-[220px] mb-2 w-full wtf object-cover object-center rounded-lg "
             />

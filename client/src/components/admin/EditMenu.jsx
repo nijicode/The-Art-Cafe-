@@ -17,6 +17,7 @@ const EditMenu = () => {
   const { deleting, deleteCategory } = useDeleteCategory();
   const [categoryName, setCategoryName] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
   const lastCategoryRef = useRef();
   useListenCategory();
   const handleSubmit = async (e) => {

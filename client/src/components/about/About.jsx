@@ -12,6 +12,7 @@ const About = () => {
   const mission = history?.mission?.image;
   const vision = history?.vision?.image;
   const values = history?.values?.image;
+  const url = "https://the-art-cafe.onrender.com/";
   useListenHistory();
 
   return (
@@ -29,7 +30,7 @@ const About = () => {
         >
           <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
             <img
-              src={`http://localhost:3001/about/${mission}`}
+              src={`${url}about/${mission}`}
               alt=""
               className="object-cover object-center w-full h-full hover:scale-110 duration-500 rounded-xl"
             />
@@ -50,7 +51,7 @@ const About = () => {
         >
           <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
             <img
-              src={`http://localhost:3001/about/${vision}`}
+              src={`${url}about/${vision}`}
               alt=""
               className="object-cover object-center w-full h-full hover:scale-110 duration-500  rounded-xl"
             />
@@ -73,7 +74,7 @@ const About = () => {
         >
           <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
             <img
-              src={`http://localhost:3001/about/${values}`}
+              src={`${url}about/${values}`}
               alt=""
               className="object-cover object-center w-full hover:scale-110 duration-500 h-full rounded-xl"
             />

@@ -14,6 +14,7 @@ const EditHero = () => {
   const [mainTitle, setMainTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
   const [uploadVideo, setUploadVideo] = useState(null);
+  const url = "https://the-art-cafe.onrender.com/";
   const { loading: updateHeroLoading, updateHero } = useUpdateHero();
   useListenHero();
 
@@ -27,7 +28,7 @@ const EditHero = () => {
   const videoSrc = useMemo(() => {
     return uploadVideo
       ? URL.createObjectURL(uploadVideo)
-      : hero?.bgVideo && `http://localhost:3001/video/${hero.bgVideo}`;
+      : hero?.bgVideo && `${url}video/${hero.bgVideo}`;
   }, [uploadVideo, hero?.bgVideo]);
 
   useEffect(() => {

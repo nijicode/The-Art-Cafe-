@@ -17,7 +17,6 @@ import useListenCategory from "../../hooks/socketListener/useListenCategory";
 
 const MenuList = () => {
   useGetItems();
-  const url = "http://localhost:3001";
   const [uploadImage, setUploadImage] = useState("");
   const { categories } = useCategoryStorage();
   const { waiting } = useGetCategory();
@@ -27,6 +26,7 @@ const MenuList = () => {
   const [itemId, setItemId] = useState("");
   const { deleting, deleteItem } = useDeleteItem();
   const textareaRef = useRef(null);
+  const url = "https://the-art-cafe.onrender.com/";
   const { items } = useItemsStorage();
   useListenItems();
   useListenCategory();
@@ -285,7 +285,7 @@ const MenuList = () => {
                     <td>
                       <div className="max-w-[150px] overflow-hidden rounded-lg group">
                         <img
-                          src={`${url}/images/${item.image}`}
+                          src={`${url}images/${item.image}`}
                           alt=""
                           className="w-full h-full max-h-[120px] object-cover object-center duration-500 group-hover:scale-110 "
                         />

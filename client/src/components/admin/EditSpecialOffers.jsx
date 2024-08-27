@@ -15,6 +15,7 @@ const EditSpecialOffers = () => {
   const { loading: loadingGet } = useGetOffers();
   const { offers } = useOfferStorage();
   const [images, setImages] = useState([]);
+  const url = "https://the-art-cafe.onrender.com/";
   useListenOffers();
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const EditSpecialOffers = () => {
                     className="image-container overflow-hidden rounded-lg  "
                   >
                     <img
-                      src={`http://localhost:3001/carousel/${image}`}
+                      src={`${url}carousel/${image}`}
                       alt={`Preview ${index + 1}`}
                       className="w-full h-[200px] object-cover object-center hover:opacity-70 "
                     />

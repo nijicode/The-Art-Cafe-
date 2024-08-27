@@ -12,7 +12,7 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     // Initialize the socket connection when the component is mounted
-    const newSocket = io("http://localhost:3001"); // Replace with your socket server URL
+    const newSocket = io("https://the-art-cafe.onrender.com"); // Replace with your socket server URL
     setSocket(newSocket);
 
     // Clean up the socket connection when the component is unmounted

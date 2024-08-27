@@ -11,6 +11,7 @@ const Hero = () => {
   const [subTitle, setSubTitle] = useState(null);
   const [mainTitle, setMainTitle] = useState(null);
   const [video, setVideo] = useState(null);
+  const url = "https://the-art-cafe.onrender.com/";
   useListenHero();
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const Hero = () => {
       <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,.9)]"></div>
       <video
         className="w-full h-full object-cover object-center"
-        src={`http://localhost:3001/video/${video}`}
+        src={`${url}${video}`}
         autoPlay
         loop
         muted

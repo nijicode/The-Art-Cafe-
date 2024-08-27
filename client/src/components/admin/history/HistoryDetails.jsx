@@ -11,6 +11,7 @@ const HistoryDetails = ({ name, image, description }) => {
   const [input, setInput] = useState(description);
   const [category, setCategory] = useState(name);
   const { loading, updateHistory } = useUpdateHistory();
+  const url = "https://the-art-cafe.onrender.com/";
 
   useEffect(() => {
     setInput(description);
@@ -62,7 +63,7 @@ const HistoryDetails = ({ name, image, description }) => {
                       src={
                         uploadImg
                           ? URL.createObjectURL(uploadImg)
-                          : `http://localhost:3001/about/${image}`
+                          : `${url}about/${image}`
                       }
                       alt=""
                       className={`w-full h-[200px] object-cover object-center hover:scale-110 duration-500 `}
