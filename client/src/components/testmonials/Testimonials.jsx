@@ -130,7 +130,7 @@ const Testimonials = () => {
             )
           )}
         </div>
-        <div className="px-10 flex w-full mt-5 justify-end">
+        <div className="flex w-full mt-5 justify-end">
           <div className="join">
             <button
               className="join-item btn bg-white text-black hover:bg-white hover:bg-opacity-70 border-none rounded-bl-full rounded-tl-full"
