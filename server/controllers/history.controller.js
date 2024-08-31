@@ -1,174 +1,74 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import { io } from "../socket/socket.js";
+import History from "../models/history.model.js";
+import { deleteFile, uploadImage } from "./file.controller.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const addHistory = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const { buffer, originalname, mimetype } = req.file;
+    const imageName = `${Date.now()}_${originalname}`;
 
-const missionDetails = path.join(__dirname, "..", "data", "mission.json");
-const visionDetails = path.join(__dirname, "..", "data", "vision.json");
-const valuesDetails = path.join(__dirname, "..", "data", "values.json");
+    if (!title || !description) {
+      return res.status(404).json({ error: "Please fill in all the fields" });
+    }
 
-const readJSONFile = (filePath) => {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, "utf8", (err, data) => {
-      if (err) {
-        console.error(`Error reading file at ${filePath}:`, err);
-        return reject(err);
-      }
-      try {
-        const jsonData = JSON.parse(data);
-        resolve(jsonData);
-      } catch (parseError) {
-        console.error(
-          `Error parsing JSON data from file at ${filePath}:`,
-          parseError
-        );
-        reject(parseError);
-      }
+    const downloadURL = await uploadImage(buffer, imageName, mimetype);
+
+    const newHistory = new History({
+      title,
+      imageName,
+      imageURL: downloadURL,
+      description,
     });
-  });
+
+    await newHistory.save();
+    res
+      .status(200)
+      .json({ message: "History saved successfully", product: newHistory });
+  } catch (error) {
+    console.log("Error in addHistory controller", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateHistory = async (req, res) => {
+  try {
+    const { id: historyId } = req.params;
+    const { description } = req.body;
+
+    const history = await History.findById(historyId);
+    if (!history) {
+      return res.status(404).json({ error: "History not found" });
+    }
+
+    if (req.file) {
+      const { buffer, originalname, mimetype } = req.file;
+      const imageName = `${Date.now()}_${originalname}`;
+      await deleteFile(`images/${history.imageName}`);
+      const downloadURL = await uploadImage(buffer, imageName, mimetype);
+      history.imageName = imageName;
+      history.imageURL = downloadURL;
+    }
+
+    if (description) history.description = description;
+
+    await history.save();
+    io.emit("updatedHistory", history);
+    res
+      .status(200)
+      .json({ message: "History updated successfully", history: history });
+  } catch (error) {
+    console.log("Error in updateHistory controller", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const getHistory = async (req, res) => {
   try {
-    const [mission, vision, values] = await Promise.all([
-      readJSONFile(missionDetails),
-      readJSONFile(visionDetails),
-      readJSONFile(valuesDetails),
-    ]);
-    res.json({
-      mission,
-      vision,
-      values,
-    });
+    let allHistory = await History.find();
+    res.status(200).json(allHistory);
   } catch (error) {
-    console.error("Error in getHistory:", error);
+    console.error("Error in getHistory", error.message);
     res.status(500).json({ error: "Error reading JSON files" });
   }
-};
-
-export const updateMission = (req, res) => {
-  const { description } = req.body;
-  const image = req.file ? req.file.filename : null;
-
-  fs.readFile(missionDetails, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error in updateMission:", err);
-      return res.status(500).send("Error reading file");
-    }
-
-    const oldDetails = JSON.parse(data);
-
-    if (oldDetails.image && req.file) {
-      fs.unlink(
-        path.join(__dirname, "..", "..", "historyImg", oldDetails.image),
-        (err) => {
-          if (err) console.error("Error deleting old video file:", err);
-        }
-      );
-    }
-
-    const newDetails = {
-      image: image || oldDetails.image,
-      description,
-    };
-
-    fs.writeFile(
-      missionDetails,
-      JSON.stringify(newDetails, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          console.error("Error in updateMission:", err);
-          return res.status(500).send("Error writing file");
-        }
-        io.emit("newMission", newDetails);
-        res.send("Mission details updated successfully");
-      }
-    );
-  });
-};
-export const updateVision = (req, res) => {
-  const { description } = req.body;
-  const image = req.file ? req.file.filename : null;
-
-  fs.readFile(visionDetails, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error in updateVission:", err);
-      return res.status(500).send("Error reading file");
-    }
-
-    const oldDetails = JSON.parse(data);
-
-    if (oldDetails.image && req.file) {
-      fs.unlink(
-        path.join(__dirname, "..", "..", "historyImg", oldDetails.image),
-        (err) => {
-          if (err) console.error("Error deleting old video file:", err);
-        }
-      );
-    }
-
-    const newDetails = {
-      image: image || oldDetails.image,
-      description,
-    };
-    fs.writeFile(
-      visionDetails,
-      JSON.stringify(newDetails, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          console.error("Error in updateVision:", err);
-          return res.status(500).send("Error writing file");
-        }
-        io.emit("newVision", newDetails);
-        res.send("Vision details updated successfully");
-      }
-    );
-  });
-};
-export const updateValues = (req, res) => {
-  const { description } = req.body;
-  const image = req.file ? req.file.filename : null;
-
-  console.log(image);
-
-  fs.readFile(valuesDetails, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error in updateValues:", err);
-      return res.status(500).send("Error reading file");
-    }
-
-    const oldDetails = JSON.parse(data);
-
-    if (oldDetails.image && req.file) {
-      fs.unlink(
-        path.join(__dirname, "..", "..", "historyImg", oldDetails.image),
-        (err) => {
-          if (err) console.error("Error deleting old video file:", err);
-        }
-      );
-    }
-
-    const newDetails = {
-      image: image || oldDetails.image,
-      description,
-    };
-    fs.writeFile(
-      valuesDetails,
-      JSON.stringify(newDetails, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          console.error("Error in updateValues:", err);
-          return res.status(500).send("Error writing file");
-        }
-        io.emit("newVision", newDetails);
-        res.send("Values details updated successfully");
-      }
-    );
-  });
 };

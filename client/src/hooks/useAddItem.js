@@ -6,6 +6,9 @@ const useAddItems = () => {
   const [loading, setLoading] = useState(false);
 
   const addItem = async (categoryId, productDetails, image) => {
+    if (!categoryId) {
+      return toast.error("Please select category first!");
+    }
     if (!image) {
       return toast.error("image is required");
     }

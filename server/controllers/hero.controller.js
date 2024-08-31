@@ -1,56 +1,74 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import { io } from "../socket/socket.js";
+import { deleteFile, uploadVideo } from "./file.controller.js";
+import Hero from "../models/hero.model.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const addHero = async (req, res) => {
+  try {
+    const { mainTitle, subTitle } = req.body;
+    const { buffer, originalname, mimetype } = req.file;
+    const videoName = `${Date.now()}_${originalname}`;
 
-const heroDetailsPath = path.join(__dirname, "..", "data", "heroDetails.json");
-export const getHeroDetails = (req, res) => {
-  fs.readFile(heroDetailsPath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send("Error reading file");
+    if (!mainTitle || !subTitle) {
+      return res.status(404).json({ error: "Please fill in all the fields" });
     }
-    res.json(JSON.parse(data));
-  });
+
+    const downloadURL = await uploadVideo(buffer, videoName, mimetype);
+
+    const newHero = new Hero({
+      videoName,
+      videoURL: downloadURL,
+      mainTitle,
+      subTitle,
+    });
+
+    await newHero.save();
+
+    res.status(200).json({ message: "Hero saved successfully", Hero: newHero });
+  } catch (error) {
+    console.log("Error in addHero controller", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
 };
 
-export const updateHeroDetails = (req, res) => {
-  const { header1, header2 } = req.body;
-  const bgVideo = req.file ? req.file.filename : null;
+export const getHero = async (req, res) => {
+  try {
+    const allHero = await Hero.find();
+    const heroDetails = allHero[0];
+    res.status(200).json(heroDetails);
+  } catch (error) {
+    console.log("Error in getHero controller", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
+};
 
-  fs.readFile(heroDetailsPath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send("Error reading file");
+export const updateHero = async (req, res) => {
+  try {
+    const { id: heroId } = req.params;
+    const { mainTitle, subTitle } = req.body;
+
+    const hero = await Hero.findById(heroId);
+    if (!hero) {
+      return res.status(404).json({ error: "Hero not found" });
     }
 
-    const oldDetails = JSON.parse(data);
-    if (oldDetails.bgVideo && req.file) {
-      fs.unlink(
-        path.join(__dirname, "..", "..", "bgVid", oldDetails.bgVideo),
-        (err) => {
-          if (err) console.error("Error deleting old video file:", err);
-        }
-      );
+    if (req.file) {
+      const { buffer, originalname, mimetype } = req.file;
+      const videoName = `${Date.now()}_${originalname}`;
+      await deleteFile(`videos/${hero.videoName}`);
+      const downloadURL = await uploadVideo(buffer, videoName, mimetype);
+      hero.videoName = videoName;
+      hero.videoURL = downloadURL;
     }
 
-    const newDetails = {
-      bgVideo: bgVideo || oldDetails.bgVideo,
-      header1,
-      header2,
-    };
-    fs.writeFile(
-      heroDetailsPath,
-      JSON.stringify(newDetails, null, 2),
-      "utf8",
-      (err) => {
-        if (err) {
-          return res.status(500).send("Error writing file");
-        }
-        io.emit("newHero", newDetails);
-        res.send("Hero details updated successfully");
-      }
-    );
-  });
+    if (mainTitle) hero.mainTitle = mainTitle;
+    if (subTitle) hero.subTitle = subTitle;
+
+    await hero.save();
+
+    io.emit("newHero", hero);
+    res.status(200).json({ message: "Hero updated successfully", hero: hero });
+  } catch (error) {
+    console.log("Error in updateHero controller", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
 };

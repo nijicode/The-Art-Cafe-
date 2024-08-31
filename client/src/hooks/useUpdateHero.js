@@ -5,29 +5,25 @@ import { toast } from "sonner";
 const useUpdateHero = () => {
   const [loading, setLoading] = useState(false);
 
-  const updateHero = async (uploadVideo, mainTitle, subTitle) => {
+  const updateHero = async (uploadVideo, mainTitle, subTitle, heroId) => {
     const formData = new FormData();
-    formData.append("header1", mainTitle);
-    formData.append("header2", subTitle);
+    formData.append("mainTitle", mainTitle);
+    formData.append("subTitle", subTitle);
 
     if (uploadVideo) {
-      formData.append("bgVideo", uploadVideo);
+      formData.append("video", uploadVideo);
     }
-
-    console.log(formData);
     setLoading(true);
     try {
-      const res = await axios.put(`/api/hero/hero-details/update`, formData, {
+      const res = await axios.put(`/api/hero/update/${heroId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
       const data = res.data;
-      console.log("Response data:", data);
       if (data.error) {
         throw new Error(data.error);
       }
-
       setTimeout(() => {
         toast.success("Hero has been edited");
       }, 2000);

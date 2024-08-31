@@ -10,7 +10,11 @@ const itemSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
-    image: {
+    imageName: {
+      type: String,
+      default: "",
+    },
+    imageURL: {
       type: String,
       default: "",
     },

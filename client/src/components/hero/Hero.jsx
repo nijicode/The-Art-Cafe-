@@ -11,14 +11,13 @@ const Hero = () => {
   const [subTitle, setSubTitle] = useState(null);
   const [mainTitle, setMainTitle] = useState(null);
   const [video, setVideo] = useState(null);
-  const url = "https://the-art-cafe.onrender.com/";
   useListenHero();
 
   useEffect(() => {
     if (hero) {
-      setMainTitle(hero.header1 || "");
-      setSubTitle(hero.header2 || "");
-      setVideo(hero.bgVideo || "");
+      setMainTitle(hero.mainTitle || "");
+      setSubTitle(hero.subTitle || "");
+      setVideo(hero.videoURL || "");
     }
   }, [hero]);
 
@@ -27,7 +26,7 @@ const Hero = () => {
       <div className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,.9)]"></div>
       <video
         className="w-full h-full object-cover object-center"
-        src={`${url}video/${video}`}
+        src={`${video}`}
         autoPlay
         loop
         muted

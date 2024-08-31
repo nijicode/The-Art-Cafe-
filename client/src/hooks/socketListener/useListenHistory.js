@@ -1,30 +1,21 @@
 import { useEffect } from "react";
 import { useSocketContext } from "../../context/SocketContext";
 import useHistoryStorage from "../../zustand/useHistoryStorage";
+import useGetHistory from "../useGetHistory";
 
 const useListenHistory = () => {
   const { socket } = useSocketContext();
-  const { setMission, setVision, setValues } = useHistoryStorage();
+  const { updateHistory } = useHistoryStorage();
 
   useEffect(() => {
-    socket?.on("newMission", (newMission) => {
-      setMission(newMission);
-    });
-
-    socket?.on("newVision", (newVision) => {
-      setVision(newVision);
-    });
-
-    socket?.on("newValues", (newValues) => {
-      setValues(newValues);
+    socket?.on("updatedHistory", (updatedHistory) => {
+      updateHistory(updatedHistory);
     });
 
     return () => {
-      socket?.off("newMission");
-      socket?.off("newVision");
-      socket?.off("newValues");
+      socket?.off("updatedHistory");
     };
-  }, [socket, setMission, setVision, setValues]);
+  }, [socket, updateHistory]);
 };
 
 export default useListenHistory;

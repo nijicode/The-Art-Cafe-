@@ -1,12 +1,7 @@
 import Category from "../models/category.model.js";
 import Item from "../models/item.model.js";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import { io } from "../socket/socket.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { deleteFile } from "./file.controller.js";
 
 export const addCategory = async (req, res) => {
   try {
@@ -49,28 +44,18 @@ export const deleteCategory = async (req, res) => {
     // Find all items associated with this category
     const items = await Item.find({ category: categoryId });
 
-    // Loop through each item and delete it
     for (const item of items) {
-      // Unlink the image if it exists
-      if (item.image) {
-        const imagePath = path.join(
-          __dirname,
-          "..",
-          "..",
-          "uploads",
-          item.image
+      try {
+        if (item.imageName) {
+          await deleteFile(`images/${item.imageName}`);
+        }
+        await Item.deleteOne({ _id: item._id });
+      } catch (error) {
+        console.error(
+          "An error occurred during the item processing",
+          error.message
         );
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            console.error(`Failed to delete image ${item.image}:`, err);
-          } else {
-            console.log(`Successfully deleted image ${item.image}`);
-          }
-        });
       }
-
-      // Delete the item
-      await Item.deleteOne({ _id: item._id });
     }
 
     // Now delete the category
@@ -79,6 +64,7 @@ export const deleteCategory = async (req, res) => {
     res
       .status(200)
       .json({ message: "Category and associated items deleted successfully" });
+    console.log(`${category.title} category was deleted`);
   } catch (error) {
     console.log("Error in deleteCategory controller", error.message);
     res.status(500).json({ error: "internal server error" });

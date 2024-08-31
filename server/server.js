@@ -33,10 +33,6 @@ app.use("/api/history", historyRoute);
 app.use("/api/offers", offersRoute);
 app.use("/api/testimonial", testimonialRoute);
 
-app.use("/images", express.static("uploads"));
-app.use("/video", express.static("bgVid"));
-app.use("/carousel", express.static("offersImg"));
-app.use("/about", express.static("historyImg"));
 app.use(express.static(path.join(__dirname, "/client/dist")));
 
 app.get("*", (req, res) => {

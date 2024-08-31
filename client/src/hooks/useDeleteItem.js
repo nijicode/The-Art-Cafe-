@@ -10,7 +10,6 @@ const useDeleteItem = () => {
     try {
       const res = await axios.delete(`/api/item/delete/${itemId}`);
       const data = res.data;
-      console.log("Response data:", data);
       if (data.error) {
         throw new Error(data.error);
       }

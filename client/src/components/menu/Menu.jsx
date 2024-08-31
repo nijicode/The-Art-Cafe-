@@ -81,7 +81,7 @@ const Menu = () => {
                       <Colds
                         id={item._id}
                         name={item.productName}
-                        img={item.image}
+                        img={item.imageURL}
                         mPrice={item.mPrice}
                         lPrice={item.lPrice}
                         description={item.description}

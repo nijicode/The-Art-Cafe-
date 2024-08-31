@@ -23,7 +23,6 @@ const useEditItem = () => {
         },
       });
       const data = res.data;
-      console.log("Response data:", data);
       if (data.error) {
         throw new Error(data.error);
       }

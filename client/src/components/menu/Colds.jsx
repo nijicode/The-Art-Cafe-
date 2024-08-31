@@ -20,8 +20,13 @@ const Colds = ({
   const [isClicked, setIsClicked] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { updateHearts } = useUpdateHearts();
   const animationRef = useRef(null);
+
+  const handleImageLoad = () => {
+    setIsLoaded(true);
+  };
 
   const handleHeartCount = async (id, name, hearts) => {
     const newHeartCount = hearts + 1;
@@ -43,6 +48,7 @@ const Colds = ({
 
     return diffDays <= 7;
   };
+
   return (
     <div
       className=" select-none duration-500 hover:scale-105 "
@@ -65,9 +71,12 @@ const Colds = ({
           )}
           <div className="relative">
             <img
-              src={`${url}images/${img}`}
+              src={`${img}`}
               alt={`${name} image`}
-              className="h-[220px] mb-2 w-full wtf object-cover object-center rounded-lg "
+              className={`h-[220px] mb-2 w-full wtf object-cover object-center rounded-lg ${
+                isLoaded ? "blur-0" : "blur-md"
+              } `}
+              onLoad={handleImageLoad}
             />
             <div className="absolute duration-500 opacity-0 hover:opacity-100 rounded-lg top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.5)]">
               <div className="flex justify-center items-center w-full h-full ">

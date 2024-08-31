@@ -5,19 +5,19 @@ import useHistoryStorage from "../zustand/useHistoryStorage";
 
 const useGetHistory = () => {
   const [loading, setLoading] = useState(false);
-  const { setHistory } = useHistoryStorage();
+  const { setHistories } = useHistoryStorage();
 
   useEffect(() => {
     const getHistory = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("/api/history/history-details");
+        const res = await axios.get("/api/history/get");
         const data = res.data;
         if (data.error) {
           throw new Error(data.error);
         }
 
-        setHistory(data);
+        setHistories(data);
       } catch (error) {
         if (error.response) {
           toast.error(error.response.data.error);

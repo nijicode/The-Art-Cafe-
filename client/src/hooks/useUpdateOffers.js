@@ -7,7 +7,7 @@ const useUpdateOffers = () => {
   const [loading, setLoading] = useState(false);
   const { setOffers } = useOfferStorage();
 
-  const updateOffers = async (selectedFiles, inputs) => {
+  const updateOffers = async (selectedFiles, inputs, offersId) => {
     const formData = new FormData();
     formData.append("mainTitle", inputs.mainTitle);
     formData.append("subTitle", inputs.subTitle);
@@ -18,17 +18,12 @@ const useUpdateOffers = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.put(
-        "/api/offers/offers-details/update",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.put(`/api/offers/update/${offersId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       const data = res.data;
-      console.log("Response data:", data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -36,7 +31,6 @@ const useUpdateOffers = () => {
       setTimeout(() => {
         toast.success("Offers Updated");
       }, 2000);
-      setOffers(data);
     } catch (error) {
       if (error.response.data.error) {
         toast.error(error.response.data.error);

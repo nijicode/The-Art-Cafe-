@@ -1,13 +1,18 @@
 import express from "express";
 import {
-  getOffersDetail,
-  updateOffersDetail,
+  addOffers,
+  getOffers,
+  updateOffers,
 } from "../controllers/offers.controller.js";
-import uploadOffersRoute from "../middleware/uploadOffersRoute.js";
+import multer from "multer";
+import protectRoute from "../middleware/protectRoute.js";
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.get("/offers-details", getOffersDetail);
-router.put("/offers-details/update", uploadOffersRoute, updateOffersDetail);
+router.post("/add", protectRoute, upload.array("images"), addOffers);
+router.get("/get", getOffers);
+router.put("/update/:id", protectRoute, upload.array("images"), updateOffers);
 
 export default router;

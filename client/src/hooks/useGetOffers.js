@@ -12,7 +12,7 @@ const useGetOffers = () => {
     const getOffers = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("/api/offers/offers-details");
+        const res = await axios.get("/api/offers/get");
         const data = res.data;
         if (data.error) {
           throw new Error(data.error);

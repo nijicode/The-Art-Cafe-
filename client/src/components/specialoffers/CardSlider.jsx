@@ -8,11 +8,10 @@ const CardSlider = ({
   // const slides = [cold1, cold2, cold3, cold4, cold5];
   const [slides, setSlides] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const url = "https://the-art-cafe.onrender.com/";
 
   useEffect(() => {
-    if (offers && offers.images) {
-      setSlides(offers.images);
+    if (offers && offers.imageURLs) {
+      setSlides(offers.imageURLs);
     }
   }, [offers]);
 
@@ -38,13 +37,21 @@ const CardSlider = ({
   }, [currentIndex]);
 
   return (
-    <div className="max-w-3xl h-[350px] lg:h-[400px] xl:h-[500px] 2xl:h-[600px] relative group">
-      <div className="absolute w-full h-full overflow-hidden border-2 rounded-3xl">
-        <img
-          src={`${url}carousel/${slides[currentIndex]}`}
-          className="object-cover duration-500 w-full h-full hover:scale-110  object-center"
-          alt="carousel img"
-        />
+    <div className="max-w-3xl rounded-xl overflow-hidden  h-[350px] lg:h-[400px] xl:h-[500px] 2xl:h-[600px] relative group">
+      <div className=" absolute flex w-full h-full overflow-hidden">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className="w-full h-full duration-500 shrink-0"
+            style={{ translate: `${-100 * currentIndex}%` }}
+          >
+            <img
+              src={`${slide}`}
+              className="object-cover w-full h-full object-center "
+              alt="carousel img"
+            />
+          </div>
+        ))}
       </div>
       <div className=" absolute text-white hidden group-hover:block top-[45%] hover:opacity-80 text-5xl left-5 duration-500 cursor-pointer">
         <ion-icon name="chevron-back-circle" onClick={prevSlide}></ion-icon>

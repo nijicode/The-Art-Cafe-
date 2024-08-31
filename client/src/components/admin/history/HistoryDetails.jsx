@@ -5,35 +5,31 @@ import { MdOutlineCancel } from "react-icons/md";
 import useUpdateHistory from "../../../hooks/useUpdateHistory";
 import { toast } from "sonner";
 
-const HistoryDetails = ({ name, image, description }) => {
+const HistoryDetails = ({ name, image, description, historyId }) => {
   const [uploadImg, setUploadImg] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [input, setInput] = useState(description);
-  const [category, setCategory] = useState(name);
   const { loading, updateHistory } = useUpdateHistory();
-  const url = "https://the-art-cafe.onrender.com/";
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    setInput(description);
-    setCategory(name);
-  }, [description, name]);
+  const handleImageLoad = () => {
+    setIsLoaded(true);
+  };
 
   const handleCancel = () => {
     setIsEdit(false);
     setUploadImg(null);
     setInput(description);
-    setCategory(name);
     toast.error("Edit Cancelled!");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateHistory(uploadImg, input, category);
+    await updateHistory(uploadImg, input, historyId);
     setUploadImg(null);
     setTimeout(() => {
       setIsEdit(false);
       setInput(description);
-      setCategory(name);
     }, 2000);
   };
 
@@ -61,9 +57,7 @@ const HistoryDetails = ({ name, image, description }) => {
                   >
                     <img
                       src={
-                        uploadImg
-                          ? URL.createObjectURL(uploadImg)
-                          : `${url}about/${image}`
+                        uploadImg ? URL.createObjectURL(uploadImg) : `${image}`
                       }
                       alt=""
                       className={`w-full h-[200px] object-cover object-center hover:scale-110 duration-500 `}
@@ -118,9 +112,12 @@ const HistoryDetails = ({ name, image, description }) => {
           <div className="flex flex-col md:flex-row gap-10 justify-center items-center">
             <div className=" w-[300px] border-2 rounded-lg overflow-hidden group ">
               <img
-                className="w-full h-[200px] object-cover object-center group-hover:scale-110 cursor-pointer duration-500 "
-                src={`${url}about/${image}`}
+                className={`w-full h-[200px] object-cover object-center group-hover:scale-110 cursor-pointer duration-500 ${
+                  isLoaded ? "blur-0" : "blur-md"
+                }`}
+                src={`${image}`}
                 alt={`art-cafe ${name} image`}
+                onLoad={handleImageLoad}
               />
             </div>
             <span className=" w-[350px] text-justify break-word">
@@ -133,7 +130,6 @@ const HistoryDetails = ({ name, image, description }) => {
             onClick={() => {
               setIsEdit(true);
               setInput(description);
-              setCategory(name);
             }}
           >
             <FaRegEdit />

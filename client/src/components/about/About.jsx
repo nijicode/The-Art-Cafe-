@@ -8,84 +8,50 @@ import { fadeIn } from "../../assets/variants";
 
 const About = () => {
   useGetHistory();
-  const { history } = useHistoryStorage();
-  const mission = history?.mission?.image;
-  const vision = history?.vision?.image;
-  const values = history?.values?.image;
-  const url = "https://the-art-cafe.onrender.com/";
+  const { histories } = useHistoryStorage();
+  const [isLoaded, setIsLoaded] = useState(false);
   useListenHistory();
 
+  const handleImageLoad = () => {
+    setIsLoaded(true);
+  };
   return (
     <div
       className="bg-black overflow-clip w-full z-10 h-auto py-10 md:p-20 "
       id="service"
     >
       <div className="flex w-full h-auto flex-col gap-12">
-        <motion.div
-          className="flex gap-8 md:flex-row flex-col"
-          variants={fadeIn("left", 0, 1)}
-          initial="hidden"
-          whileInView={"show"}
-          viewport={{ once: false }}
-        >
-          <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
-            <img
-              src={`${url}about/${mission}`}
-              alt=""
-              className="object-cover object-center w-full h-full hover:scale-110 duration-500 rounded-xl"
-            />
-          </div>
-          <div className=" text-white flex-1 flex flex-col justify-center">
-            <h1 className="font-bold text-xl mb-4">Our Mission</h1>
-            <p>
-              {history && history.mission ? history.mission.description : ""}
-            </p>
-          </div>
-        </motion.div>
-        <motion.div
-          className="flex gap-8 md:flex-row-reverse flex-col"
-          variants={fadeIn("right", 0, 1)}
-          initial="hidden"
-          whileInView={"show"}
-          viewport={{ once: false }}
-        >
-          <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
-            <img
-              src={`${url}about/${vision}`}
-              alt=""
-              className="object-cover object-center w-full h-full hover:scale-110 duration-500  rounded-xl"
-            />
-          </div>
-          <div className="text-white flex-1 flex flex-col justify-center">
-            <div className=" self-end ">
-              <h1 className="font-bold text-xl mb-4 ">Our Vision</h1>
-              <p>
-                {history && history.mission ? history.vision.description : ""}
-              </p>
+        {histories.map((history, index) => (
+          <motion.div
+            key={index}
+            className={`flex gap-8 ${
+              index === 1 ? "md:flex-row-reverse" : "md:flex-row"
+            } flex-col`}
+            variants={fadeIn(index === 1 ? "right " : "left", 0, 1)}
+            initial="hidden"
+            whileInView={"show"}
+            viewport={{ once: false }}
+          >
+            <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
+              <img
+                src={history.imageURL}
+                alt=""
+                className={`object-cover object-center w-full h-full hover:scale-110 duration-500 rounded-xl ${
+                  isLoaded ? "blur-0" : "blur-md"
+                } `}
+                onLoad={handleImageLoad}
+              />
             </div>
-          </div>
-        </motion.div>
-        <motion.div
-          className="flex gap-8 md:flex-row flex-col"
-          variants={fadeIn("left", 0, 1)}
-          initial="hidden"
-          whileInView={"show"}
-          viewport={{ once: false }}
-        >
-          <div className="w-full md:w-[300px] overflow-hidden lg:w-[500px] h-[350px] rounded-lg shadow-lg shadow-gray-600">
-            <img
-              src={`${url}about/${values}`}
-              alt=""
-              className="object-cover object-center w-full hover:scale-110 duration-500 h-full rounded-xl"
-            />
-          </div>
-          <div className="text-white flex-1 flex flex-col justify-center">
-            <h1 className="font-bold text-xl mb-4">Our Values</h1>
-            <p>
-              {history && history.mission ? history.values.description : ""}
-            </p>
-          </div>
-        </motion.div>
+            <div className=" text-white flex-1 flex flex-col justify-center">
+              <div className={`${index === 1 ? "self-end" : ""}`}>
+                <h1 className="font-bold text-xl mb-4">
+                  Our <span className="capitalize">{history.title}</span>
+                </h1>
+                <p>{history.description}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

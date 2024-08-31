@@ -6,30 +6,32 @@ import useUpdateHero from "../../hooks/useUpdateHero";
 import { toast } from "sonner";
 import useHeroStorage from "../../zustand/useHeroStorage";
 import useListenHero from "../../hooks/socketListener/useListenHero";
+import { set } from "mongoose";
 
 const EditHero = () => {
   const [isEdit, setIsEdit] = useState(false);
-  const { loading: heroLoading } = useGetHero();
   const { hero } = useHeroStorage();
   const [mainTitle, setMainTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
   const [uploadVideo, setUploadVideo] = useState(null);
-  const url = "https://the-art-cafe.onrender.com/";
+  const [heroId, setHeroId] = useState(null);
   const { loading: updateHeroLoading, updateHero } = useUpdateHero();
+  useGetHero();
   useListenHero();
 
   useEffect(() => {
     if (hero) {
-      setMainTitle(hero.header1 || "");
-      setSubTitle(hero.header2 || "");
+      setMainTitle(hero.mainTitle || "");
+      setSubTitle(hero.subTitle || "");
+      setHeroId(hero._id);
     }
   }, [hero]);
 
   const videoSrc = useMemo(() => {
     return uploadVideo
       ? URL.createObjectURL(uploadVideo)
-      : hero?.bgVideo && `${url}video/${hero.bgVideo}`;
-  }, [uploadVideo, hero?.bgVideo]);
+      : hero?.videoURL && `${hero.videoURL}`;
+  }, [uploadVideo, hero?.videoURL]);
 
   useEffect(() => {
     return () => {
@@ -41,15 +43,14 @@ const EditHero = () => {
     // Reset form fields to original values if needed
     toast.error("Edit Cancelled!");
     setUploadVideo(null);
-    setMainTitle(hero.header1 || "");
-    setSubTitle(hero.header2 || "");
+    setMainTitle(hero.mainTitle || "");
+    setSubTitle(hero.subTitle || "");
     setIsEdit(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateHero(uploadVideo, mainTitle, subTitle);
-    refetchHero(); // Refetch the hero data after updating
+    await updateHero(uploadVideo, mainTitle, subTitle, heroId);
     setTimeout(() => {
       setIsEdit(false);
     }, 2000);

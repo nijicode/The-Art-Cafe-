@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { MdDeleteForever } from "react-icons/md";
-import useGetItemsByCategory from "../../hooks/useGetItemsByCategory";
 import useGetCategory from "../../hooks/useGetCategory";
-import { MdCancel } from "react-icons/md";
 import useEditItem from "../../hooks/useEditItem";
 import useDeleteItem from "../../hooks/useDeleteItem";
 import Lottie from "lottie-react";
 import animationData from "../../assets/animation/coffee.json";
 import useItemsStorage from "../../zustand/useItemsStorage";
 import useGetItems from "../../hooks/useGetItems";
-import useListen from "../../hooks/socketListener/useListenTestimonials";
 import useCategoryStorage from "../../zustand/useCategoryStorage";
 import useListenItems from "../../hooks/socketListener/useListenItem";
 import useListenCategory from "../../hooks/socketListener/useListenCategory";
@@ -26,7 +23,6 @@ const MenuList = () => {
   const [itemId, setItemId] = useState("");
   const { deleting, deleteItem } = useDeleteItem();
   const textareaRef = useRef(null);
-  const url = "https://the-art-cafe.onrender.com/";
   const { items } = useItemsStorage();
   useListenItems();
   useListenCategory();
@@ -43,7 +39,7 @@ const MenuList = () => {
   });
 
   const handleEdit = (item) => {
-    setImage(item.image);
+    setImage(item.imageURL);
     setInputs({
       productName: item.productName,
       mPrice: item.mPrice,
@@ -123,7 +119,7 @@ const MenuList = () => {
                     src={
                       uploadImage
                         ? URL.createObjectURL(uploadImage)
-                        : `${url}/images/${image}`
+                        : `${image}`
                     }
                     alt=""
                     className={`w-[200px] h-[200px] rounded-md ${
@@ -285,7 +281,7 @@ const MenuList = () => {
                     <td>
                       <div className="max-w-[150px] overflow-hidden rounded-lg group">
                         <img
-                          src={`${url}images/${item.image}`}
+                          src={`${item.imageURL}`}
                           alt=""
                           className="w-full h-full max-h-[120px] object-cover object-center duration-500 group-hover:scale-110 "
                         />

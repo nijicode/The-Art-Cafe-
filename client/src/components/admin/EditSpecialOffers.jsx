@@ -12,24 +12,31 @@ const EditSpecialOffers = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [inputs, setInputs] = useState({ mainTitle: "", subTitle: "" });
   const { loading: loadingOffers, updateOffers } = useUpdateOffers();
-  const { loading: loadingGet } = useGetOffers();
+  useGetOffers();
   const { offers } = useOfferStorage();
   const [images, setImages] = useState([]);
-  const url = "https://the-art-cafe.onrender.com/";
+  const [offersId, setOffersId] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   useListenOffers();
 
+  const handleImageLoad = () => {
+    setIsLoaded(true);
+  };
+
   useEffect(() => {
-    if (offers && offers.titles) {
+    if (offers) {
+      setOffersId(offers._id || "");
       setInputs({
-        mainTitle: offers.titles.mainTitle,
-        subTitle: offers.titles.subTitle,
+        mainTitle: offers.mainTitle || "",
+        subTitle: offers.subTitle || "",
       });
-      setImages(offers.images);
+      setImages(Array.isArray(offers.imageURLs) ? offers.imageURLs : []);
     }
   }, [offers]);
 
   const handleFileChange = (event) => {
     const files = event.target.files;
+    setSelectedFiles(Array.from(files));
 
     if (files.length === 5) {
       setSelectedFiles(Array.from(files));
@@ -41,8 +48,8 @@ const EditSpecialOffers = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateOffers(selectedFiles, inputs);
-    console.log(selectedFiles, inputs);
+    await updateOffers(selectedFiles, inputs, offersId);
+    setSelectedFiles([]);
   };
   return (
     <div className="flex flex-col p-5 justify-center items-center w-full">
@@ -74,9 +81,12 @@ const EditSpecialOffers = () => {
                     className="image-container overflow-hidden rounded-lg  "
                   >
                     <img
-                      src={`${url}carousel/${image}`}
+                      src={`${image}`}
                       alt={`Preview ${index + 1}`}
-                      className="w-full h-[200px] object-cover object-center hover:opacity-70 "
+                      className={`w-full h-[200px] object-cover object-center hover:opacity-70 ${
+                        isLoaded ? "blur-0" : "blur-md"
+                      }`}
+                      onLoad={handleImageLoad}
                     />
                   </div>
                 ))}

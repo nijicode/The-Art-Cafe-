@@ -1,13 +1,16 @@
 import express from "express";
-import uploadVidRoute from "../middleware/uploadVidRoute.js";
 import {
-  getHeroDetails,
-  updateHeroDetails,
+  addHero,
+  getHero,
+  updateHero,
 } from "../controllers/hero.controller.js";
+import multer from "multer";
+import protectRoute from "../middleware/protectRoute.js";
+const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 
-router.get("/hero-details", getHeroDetails);
-router.put("/hero-details/update", uploadVidRoute, updateHeroDetails);
-
+router.post("/add", protectRoute, upload.single("video"), addHero);
+router.put("/update/:id", protectRoute, upload.single("video"), updateHero);
+router.get("/get", getHero);
 export default router;

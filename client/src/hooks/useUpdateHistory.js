@@ -5,7 +5,7 @@ import { toast } from "sonner";
 const useUpdateHistory = () => {
   const [loading, setLoading] = useState(false);
 
-  const updateHistory = async (uploadImage, input, category) => {
+  const updateHistory = async (uploadImage, input, historyId) => {
     const formData = new FormData();
     formData.append("description", input);
     if (uploadImage) {
@@ -13,18 +13,21 @@ const useUpdateHistory = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.put(`/api/history/${category}/update`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await axios.put(
+        `/api/history/update/${historyId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       const data = res.data;
-      console.log("Response data:", data);
       if (data.error) {
         throw new Error(data.error);
       }
       setTimeout(() => {
-        toast.success(data);
+        toast.success("History updated Successfully");
       }, 2000);
     } catch (error) {
       if (error.response.data.error) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 import { Link } from "react-scroll";
 import CardSlider from "./CardSlider";
@@ -11,6 +11,7 @@ import { fadeIn } from "../../assets/variants";
 const SpecialOffers = () => {
   const { loading } = useGetOffers();
   const { offers } = useOfferStorage();
+  const scrollContainerRef = useRef(null);
   useListenOffers();
 
   return (
@@ -27,10 +28,10 @@ const SpecialOffers = () => {
       >
         <div className="text-center">
           <h1 className="text-3xl mb-5 md:text-5xl leading-tight md:mb-10 font-bold md:max-w-[21ch]">
-            {offers && offers.titles ? offers.titles.mainTitle : ""}
+            {offers ? offers.mainTitle : ""}
           </h1>
           <span className="text-sm md:text-lg">
-            {offers && offers.titles ? offers.titles.subTitle : ""}
+            {offers ? offers.subTitle : ""}
           </span>
           <div className="w-full flex justify-center mt-10">
             <Link

@@ -11,7 +11,7 @@ const useGetHero = () => {
     const getHero = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("/api/hero/hero-details");
+        const res = await axios.get("/api/hero/get");
         const data = res.data;
         if (data.error) {
           throw new Error(data.error);

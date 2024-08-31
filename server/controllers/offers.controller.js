@@ -1,97 +1,102 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import { promisify } from "util";
 import { io } from "../socket/socket.js";
+import { deleteFile, uploadImage } from "./file.controller.js";
+import Offers from "../models/offers.model.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export const addOffers = async (req, res) => {
+  try {
+    const { mainTitle, subTitle } = req.body;
+    const files = req.files;
+    const imageNames = [];
+    const imageURLs = [];
 
-const offersDetailsPath = path.join(
-  __dirname,
-  "..",
-  "data",
-  "offersDetails.json"
-);
-
-export const getOffersDetail = (req, res) => {
-  fs.readFile(offersDetailsPath, "utf8", (err, data) => {
-    if (err) {
-      return res.status(500).send("Error reading file");
+    if (!mainTitle || !subTitle) {
+      return res.status(404).json({ error: "Please fill in all the fields" });
     }
-    res.json(JSON.parse(data));
-  });
+
+    await Promise.all(
+      files.map(async (file) => {
+        const { buffer, originalname, mimetype } = file;
+        const imageName = `${Date.now()}_${originalname}`;
+        const imageUrl = await uploadImage(buffer, imageName, mimetype); // Assuming uploadImage returns a URL
+        imageNames.push(imageName);
+        imageURLs.push(imageUrl);
+      })
+    );
+
+    const newOffers = new Offers({
+      mainTitle,
+      subTitle,
+      imageNames,
+      imageURLs,
+    });
+
+    await newOffers.save();
+    res
+      .status(200)
+      .json({ message: "Offers saved successfully", offers: newOffers });
+  } catch (error) {
+    console.log("Error in addOffers controller", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
 };
 
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const unlink = promisify(fs.unlink);
+export const getOffers = async (req, res) => {
+  try {
+    const allOffers = await Offers.find();
+    const offersDetails = allOffers[0];
+    res.status(200).json(offersDetails);
+  } catch (error) {
+    console.log("Error in getOffers controller", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
+};
 
-export const updateOffersDetail = (req, res) => {
-  const newImageFiles = req.files || [];
-  const newImageUrls = newImageFiles.map((file) => file.filename);
-  const { mainTitle, subTitle } = req.body;
+export const updateOffers = async (req, res) => {
+  try {
+    const { id: offersId } = req.params;
+    const { mainTitle, subTitle } = req.body;
 
-  let offersData = {};
+    const offer = await Offers.findById(offersId);
+    if (!offer) {
+      return res.status(404).json({ error: "Offer not found" });
+    }
 
-  readFile(offersDetailsPath, "utf8")
-    .then((data) => {
+    if (req.files && req.files.length === 5) {
+      const imageNames = [];
+      const imageURLs = [];
+      const files = req.files;
       try {
-        offersData = JSON.parse(data);
-      } catch (parseError) {
-        throw new Error("Error parsing JSON data");
+        await Promise.all(
+          offer.imageNames.map(async (imageName) => {
+            await deleteFile(`images/${imageName}`);
+          })
+        );
+        await Promise.all(
+          files.map(async (file) => {
+            const { buffer, originalname, mimetype } = file;
+            const imageName = `${Date.now()}_${originalname}`;
+            const imageUrl = await uploadImage(buffer, imageName, mimetype); // Assuming uploadImage returns a URL
+            imageNames.push(imageName);
+            imageURLs.push(imageUrl);
+          })
+        );
+        offer.imageNames = imageNames;
+        offer.imageURLs = imageURLs;
+      } catch (error) {
+        console.error("An error occurred during file handling:", error.message);
       }
-    })
-    .catch((readError) => {
-      if (readError.code === "ENOENT") {
-        // If the file doesn't exist, initialize with default values
-        offersData = { images: [], titles: { mainTitle: "", subTitle: "" } };
-      } else {
-        // Handle other read errors
-        return Promise.reject(new Error("Error reading offers data"));
-      }
-    })
-    .then(() => {
-      // If there are new images, delete old images
-      if (newImageFiles.length === 5) {
-        return Promise.all(
-          offersData.images.map((imgUrl) =>
-            unlink(path.join(__dirname, "..", "..", "offersImg", imgUrl)).catch(
-              (unlinkError) => {
-                console.error(
-                  `Failed to delete ${imgUrl}: ${unlinkError.message}`
-                );
-                // Continue to delete other images even if one fails
-              }
-            )
-          )
-        ).then(() => {
-          // Update offers data with new images
-          offersData.images = newImageUrls;
-        });
-      } else {
-        // If there are no new images, keep the old ones
-        return Promise.resolve();
-      }
-    })
-    .then(() => {
-      // Update offers data with new images and titles
-      offersData.titles.mainTitle = mainTitle || offersData.titles.mainTitle;
-      offersData.titles.subTitle = subTitle || offersData.titles.subTitle;
+    }
 
-      // Write updated data to JSON file
-      return writeFile(
-        offersDetailsPath,
-        JSON.stringify(offersData, null, 2),
-        "utf8"
-      );
-    })
-    .then(() => {
-      io.emit("updatedOffers", offersData);
-      res.status(200).json(offersData);
-    })
-    .catch((error) => {
-      console.error(`Error processing request: ${error.message}`);
-      res.status(500).json({ message: "Error processing request" });
-    });
+    if (mainTitle) offer.mainTitle = mainTitle;
+    if (subTitle) offer.subTitle = subTitle;
+
+    await offer.save();
+    io.emit("updatedOffers", offer);
+    res
+      .status(200)
+      .json({ message: "offer updated successfully", offer: offer });
+  } catch (error) {
+    console.log("Error in updateOffers controller:", error.message);
+    res.status(500).json({ error: "internal server error" });
+  }
 };
