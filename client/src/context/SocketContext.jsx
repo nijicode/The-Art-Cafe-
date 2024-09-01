@@ -9,10 +9,13 @@ export const useSocketContext = () => {
 
 export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
+  const viteSocket = import.meta.env.VITE_SOCKET_URL;
+
+  console.log("socket:", viteSocket);
 
   useEffect(() => {
     // Initialize the socket connection when the component is mounted
-    const newSocket = io("https://the-art-cafe.onrender.com"); // Replace with your socket server URL
+    const newSocket = io(viteSocket); // Replace with your socket server URL
     setSocket(newSocket);
 
     // Clean up the socket connection when the component is unmounted
